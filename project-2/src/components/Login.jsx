@@ -1,12 +1,13 @@
+// src/components/Login.jsx - সম্পূর্ণ ফাইল
 import React, { useState } from "react";
-import { auth, googleProvider } from "../config/firebase";
+import { auth, googleProvider, githubProvider } from "../config/firebase";
 import { 
   signInWithEmailAndPassword, 
   signInWithPopup 
 } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import Navbar from "../components/Navbar";
+import Navbar from "./Navbar";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -34,6 +35,19 @@ const Login = () => {
       toast.success("Logged in with Google!");
       navigate("/");
     } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  // ✅ GitHub Login Function
+  const handleGithubLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, githubProvider);
+      console.log("GitHub Login Success:", result.user);
+      toast.success("Logged in with GitHub!");
+      navigate("/");
+    } catch (error) {
+      console.error("GitHub Login Error:", error);
       toast.error(error.message);
     }
   };
@@ -115,25 +129,48 @@ const Login = () => {
             <div className="flex-1 h-px bg-white/20"></div>
           </div>
 
-          {/* Google Login */}
-          <button
-            onClick={handleGoogleLogin}
-            className="
-              w-full py-3
-              flex items-center justify-center gap-3
-              bg-white hover:bg-gray-100
-              text-gray-800 font-semibold
-              rounded-xl
-              transition-all
-            "
-          >
-            <img 
-              src="https://www.google.com/favicon.ico" 
-              alt="Google" 
-              className="w-5 h-5"
-            />
-            Continue with Google
-          </button>
+          {/* Social Login Buttons */}
+          <div className="space-y-3">
+            <button
+              onClick={handleGoogleLogin}
+              className="
+                w-full py-3
+                flex items-center justify-center gap-3
+                bg-white hover:bg-gray-100
+                text-gray-800 font-semibold
+                rounded-xl
+                transition-all
+              "
+            >
+              <img 
+                src="https://www.google.com/favicon.ico" 
+                alt="Google" 
+                className="w-5 h-5"
+              />
+              Continue with Google
+            </button>
+
+            {/* ✅ GitHub Login Button */}
+            <button
+              onClick={handleGithubLogin}
+              className="
+                w-full py-3
+                flex items-center justify-center gap-3
+                bg-gray-800 hover:bg-gray-900
+                text-white font-semibold
+                rounded-xl
+                transition-all
+                border border-gray-700
+              "
+            >
+              <img 
+                src="https://github.githubassets.com/favicons/favicon-dark.png" 
+                alt="GitHub" 
+                className="w-5 h-5"
+              />
+              Continue with GitHub
+            </button>
+          </div>
 
           {/* Sign Up Link */}
           <p className="text-center text-white/70 mt-6">

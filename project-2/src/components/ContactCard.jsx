@@ -1,3 +1,4 @@
+// src/components/ContactCard.jsx
 import React from "react";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import { RiEditCircleLine } from "react-icons/ri";
@@ -7,9 +8,11 @@ import { db } from "../config/firebase";
 import AddAndUpdateContact from "./AddAndUpdateContact";
 import useDisclouse from "../hooks/useDisclouse";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const ContactCard = ({ contact }) => {
   const { isOpen, onClose, onOpen } = useDisclouse(false);
+  const { currentUser } = useAuth();
 
   const deleteContact = async (id) => {
     try {
@@ -20,6 +23,9 @@ const ContactCard = ({ contact }) => {
       console.log(error);
     }
   };
+
+  // শুধুমাত্র contact এর owner যদি delete/edit করতে পারে
+  const canModify = contact.userId === currentUser.uid;
 
   return (
     <>
@@ -34,36 +40,41 @@ const ContactCard = ({ contact }) => {
         {/* Left: Icon + Text */}
         <div className="flex items-center gap-3">
           <HiOutlineUserCircle className="text-5xl text-white/80" />
-
           <div className="text-white">
             <h2 className="font-semibold text-lg tracking-wide">
               {contact.name}
             </h2>
-            <p className="text-sm text-white/70">{contact.Email}</p>
+            <p className="text-sm text-white/70">{contact.email}</p>
+            {contact.phone && (
+              <p className="text-sm text-white/60">{contact.phone}</p>
+            )}
           </div>
         </div>
 
         {/* Right: Action Icons */}
-        <div className="flex items-center gap-4 text-3xl text-white/80">
-          <RiEditCircleLine
-            onClick={onOpen}
-            className="cursor-pointer hover:text-blue-300 transition"
-          />
-
-          <IoMdTrash
-            onClick={() => deleteContact(contact.id)}
-            className="cursor-pointer hover:text-red-400 transition"
-          />
-        </div>
+        {canModify && (
+          <div className="flex items-center gap-4 text-3xl text-white/80">
+            <RiEditCircleLine
+              onClick={onOpen}
+              className="cursor-pointer hover:text-blue-300 transition"
+            />
+            <IoMdTrash
+              onClick={() => deleteContact(contact.id)}
+              className="cursor-pointer hover:text-red-400 transition"
+            />
+          </div>
+        )}
       </div>
 
       {/* Modal for Update */}
-      <AddAndUpdateContact
-        contact={contact}
-        isUpdate
-        isOpen={isOpen}
-        onClose={onClose}
-      />
+      {canModify && (
+        <AddAndUpdateContact
+          contact={contact}
+          isUpdate
+          isOpen={isOpen}
+          onClose={onClose}
+        />
+      )}
     </>
   );
 };

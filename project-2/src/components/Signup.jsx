@@ -1,5 +1,6 @@
+// src/components/Signup.jsx
 import React, { useState } from "react";
-import { auth, googleProvider } from "../config/firebase";
+import { auth, googleProvider, githubProvider } from "../config/firebase";
 import { 
   createUserWithEmailAndPassword, 
   updateProfile,
@@ -7,7 +8,8 @@ import {
 } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import Navbar from "../components/Navbar";
+import Navbar from "./Navbar";
+import { FaGithub, FaGoogle, FaEnvelope } from "react-icons/fa";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -40,6 +42,16 @@ const Signup = () => {
     try {
       await signInWithPopup(auth, googleProvider);
       toast.success("Account created with Google!");
+      navigate("/");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleGithubSignup = async () => {
+    try {
+      await signInWithPopup(auth, githubProvider);
+      toast.success("Account created with GitHub!");
       navigate("/");
     } catch (error) {
       toast.error(error.message);
@@ -131,9 +143,11 @@ const Signup = () => {
                 rounded-xl
                 transition-all
                 disabled:opacity-50 disabled:cursor-not-allowed
+                flex items-center justify-center gap-2
               "
             >
-              {loading ? "Creating Account..." : "Sign Up"}
+              <FaEnvelope />
+              {loading ? "Creating Account..." : "Sign Up with Email"}
             </button>
           </form>
 
@@ -144,25 +158,39 @@ const Signup = () => {
             <div className="flex-1 h-px bg-white/20"></div>
           </div>
 
-          {/* Google Signup */}
-          <button
-            onClick={handleGoogleSignup}
-            className="
-              w-full py-3
-              flex items-center justify-center gap-3
-              bg-white hover:bg-gray-100
-              text-gray-800 font-semibold
-              rounded-xl
-              transition-all
-            "
-          >
-            <img 
-              src="https://www.google.com/favicon.ico" 
-              alt="Google" 
-              className="w-5 h-5"
-            />
-            Sign up with Google
-          </button>
+          {/* Social Signup Buttons */}
+          <div className="space-y-3">
+            <button
+              onClick={handleGoogleSignup}
+              className="
+                w-full py-3
+                flex items-center justify-center gap-3
+                bg-white hover:bg-gray-100
+                text-gray-800 font-semibold
+                rounded-xl
+                transition-all
+              "
+            >
+              <FaGoogle className="text-red-500" />
+              Sign up with Google
+            </button>
+
+            <button
+              onClick={handleGithubSignup}
+              className="
+                w-full py-3
+                flex items-center justify-center gap-3
+                bg-gray-800 hover:bg-gray-900
+                text-white font-semibold
+                rounded-xl
+                transition-all
+                border border-gray-700
+              "
+            >
+              <FaGithub className="text-white" />
+              Sign up with GitHub
+            </button>
+          </div>
 
           {/* Login Link */}
           <p className="text-center text-white/70 mt-6">
